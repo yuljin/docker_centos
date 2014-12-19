@@ -8,6 +8,9 @@ RUN yum install git -y
 # mkdir app directory 
 RUN mkdir -p /app
 
+# mkdir deploy directory
+RUN mkdir -p /deploy
+
 WORKDIR /app
 
 # install apache
@@ -46,6 +49,12 @@ ENV PATH $M2_HOME/bin:$PATH
 
 ADD start_tomcat.sh /start_tomcat.sh
 RUN chmod +x /start_tomcat.sh
+ADD server-web.xml /server-web.xml
+RUN chmod +x /server-web.xml
+
+EXPOSE 8080
 
 #ENTRYPOINT ["/app/tomcat/bin/catalina.sh", "run"]
-CMD /start_tomcat.sh
+#ENTRYPOINT /start_tomcat.sh
+
+#ENTRYPOINT /bin/bash
