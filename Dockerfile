@@ -6,12 +6,23 @@ RUN yum install tar -y
 RUN yum install git -y
 
 # mkdir app directory 
-RUN mkdir -p /app
+#RUN mkdir -p /app
 
 # mkdir deploy directory
 RUN mkdir -p /deploy
 
-WORKDIR /app
+RUN mkdir -p /home1/
+
+WORKDIR /home1
+
+RUN mkdir -p /irteam
+
+WORKDIR /home1/irteam
+
+RUN mkdir -p /apps
+
+#WORKDIR /app
+WORKDIR /home1/irteam/apps
 
 # install apache
 RUN \
@@ -25,7 +36,7 @@ RUN \
   tar -zxf tomcat.tar.gz && \
   ln -s apache-tomcat-6.0.43 tomcat
 
-ENV CATALINA_HOME /app/tomcat
+ENV CATALINA_HOME /home1/irteam/apps/tomcat
 ENV PATH $CATALINA_HOME/bin:$PATH
 
 # install jdk 
@@ -35,24 +46,33 @@ chmod 755 jdk-6u45-linux-x64.bin && \
 ./jdk-6u45-linux-x64.bin -noregister > /dev/null && \
 ln -s jdk1.6.0_45 jdk
 
-ENV JAVA_HOME /app/jdk
+#ENV JAVA_HOME /app/jdk
+ENV JAVA_HOME /home1/irteam/apps/jdk
 ENV PATH ${JAVA_HOME}/bin:$PATH
 
 # install MAVEN 
 RUN \
-wget http://apache.tt.co.kr/maven/maven-3/3.2.3/binaries/apache-maven-3.2.3-bin.tar.gz -O apache-maven-3.2.3-bin.tar.gz && \
-tar -zxf apache-maven-3.2.3-bin.tar.gz  && \
-ln -s apache-maven-3.2.3 maven 
+wget http://apache.tt.co.kr/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz -O apache-maven-3.2.5-bin.tar.gz && \
+tar -zxf apache-maven-3.2.5-bin.tar.gz  && \
+ln -s apache-maven-3.2.5 maven 
 
-ENV M2_HOME /app/maven
+#ENV M2_HOME /app/maven
+#ENV PATH $M2_HOME/bin:$PATH
+
+ENV M2_HOME /home1/irteam/apps/maven
 ENV PATH $M2_HOME/bin:$PATH
 
-ADD start_tomcat.sh /start_tomcat.sh
-RUN chmod +x /start_tomcat.sh
-ADD server-web.xml /server-web.xml
-RUN chmod +x /server-web.xml
+# ADD start_tomcat.sh /start_tomcat.sh
+#RUN chmod +x /start_tomcat.sh
 
-EXPOSE 8080
+#ADD server-web.xml /server-web.xml
+#RUN chmod +x /server-web.xml
+
+ADD deploy.sh /deploy.sh
+RUN chmod +x /deploy.sh
+RUN echo $(date) && source /deploy.sh
+
+EXPOSE 80
 
 #ENTRYPOINT ["/app/tomcat/bin/catalina.sh", "run"]
 #ENTRYPOINT /start_tomcat.sh
